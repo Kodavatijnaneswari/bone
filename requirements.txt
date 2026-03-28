@@ -27,3 +27,7 @@ PyYAML==6.0.2
 
 # PDF Generation (if used in clinical reporting)
 reportlab==4.2.5
+
+# Production
+gunicorn==22.0.0
+dj-database-url==2.1.0

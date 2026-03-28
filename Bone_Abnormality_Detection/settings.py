@@ -20,12 +20,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-cwbb9$9e*@nzmpjv5o5%7g-=310w=qht+-t8#e1f&+=icb98+m'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-cwbb9$9e*@nzmpjv5o5%7g-=310w=qht+-t8#e1f&+=icb98+m')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = 'RENDER' not in os.environ
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = []
+if 'RENDER_EXTERNAL_HOSTNAME' in os.environ:
+    ALLOWED_HOSTS.append(os.environ.get('RENDER_EXTERNAL_HOSTNAME'))
+else:
+    ALLOWED_HOSTS.append('*')
 
 
 # Application definition
@@ -46,6 +50,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -78,11 +83,13 @@ WSGI_APPLICATION = 'Bone_Abnormality_Detection.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+import dj_database_url
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
+        conn_max_age=600
+    )
 }
 
 
@@ -130,6 +137,9 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 import os
 

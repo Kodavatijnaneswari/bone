@@ -31,7 +31,7 @@ staticfiles/
 
 # ML / YOLO
 runs/
-*.pt
+# *.pt  <-- Commented out to include model weights for deployment
 datasets/
 *.log
 
